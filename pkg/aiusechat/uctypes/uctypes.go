@@ -251,20 +251,22 @@ type WaveContinueResponse struct {
 
 // Wave Specific AI opts for configuration
 type AIOptsType struct {
-	Provider      string   `json:"provider,omitempty"`
-	APIType       string   `json:"apitype,omitempty"`
-	Model         string   `json:"model"`
-	APIToken      string   `json:"apitoken"`
-	APIVersion    string   `json:"apiversion,omitempty"`
-	Endpoint      string   `json:"endpoint,omitempty"`
-	ProxyURL      string   `json:"proxyurl,omitempty"`
-	MaxTokens     int      `json:"maxtokens,omitempty"`
-	TimeoutMs     int      `json:"timeoutms,omitempty"`
-	ThinkingLevel string   `json:"thinkinglevel,omitempty"` // ThinkingLevelLow, ThinkingLevelMedium, or ThinkingLevelHigh
-	Verbosity     string   `json:"verbosity,omitempty"`     // Text verbosity level (OpenAI Responses API only, ignored by other backends)
-	AIMode        string   `json:"aimode,omitempty"`
-	Capabilities  []string `json:"capabilities,omitempty"`
-	WaveAIPremium bool     `json:"waveaipremium,omitempty"`
+	Provider         string   `json:"provider,omitempty"`
+	APIType          string   `json:"apitype,omitempty"`
+	Model            string   `json:"model"`
+	APIToken         string   `json:"apitoken"`
+	APIVersion       string   `json:"apiversion,omitempty"`
+	Endpoint         string   `json:"endpoint,omitempty"`
+	ProxyURL         string   `json:"proxyurl,omitempty"`
+	MaxTokens        int      `json:"maxtokens,omitempty"`
+	TimeoutMs        int      `json:"timeoutms,omitempty"`
+	ThinkingLevel    string   `json:"thinkinglevel,omitempty"` // ThinkingLevelLow, ThinkingLevelMedium, or ThinkingLevelHigh
+	Verbosity        string   `json:"verbosity,omitempty"`     // Text verbosity level (OpenAI Responses API only, ignored by other backends)
+	AIMode           string   `json:"aimode,omitempty"`
+	Capabilities     []string `json:"capabilities,omitempty"`
+	WaveAIPremium    bool     `json:"waveaipremium,omitempty"`
+	SystemPrompt     string   `json:"systemprompt,omitempty"`     // Custom system prompt text
+	SystemPromptMode string   `json:"systempromptmode,omitempty"` // "replace" or "append" (defaults to "replace")
 }
 
 func (opts AIOptsType) IsWaveProxy() bool {

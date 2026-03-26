@@ -303,6 +303,8 @@ type AIModeConfigType struct {
 	AzureDeployment    string   `json:"ai:azuredeployment,omitempty"`
 	Capabilities       []string `json:"ai:capabilities,omitempty" jsonschema:"enum=pdfs,enum=images,enum=tools"`
 	SwitchCompat       []string `json:"ai:switchcompat,omitempty"`
+	SystemPrompt       string   `json:"ai:systemprompt,omitempty" jsonschema_description:"Custom system prompt to control AI behavior for this mode"`
+	SystemPromptMode   string   `json:"ai:systempromptmode,omitempty" jsonschema:"enum=replace,enum=append" jsonschema_description:"How to apply the custom system prompt: replace (fully replace built-in prompt) or append (add after built-in prompt). Defaults to replace."`
 	WaveAICloud        bool     `json:"waveai:cloud,omitempty"`
 	WaveAIPremium      bool     `json:"waveai:premium,omitempty"`
 }
