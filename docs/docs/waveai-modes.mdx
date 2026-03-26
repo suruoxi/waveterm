@@ -430,6 +430,56 @@ When using providers like `openai` or `openrouter`, the secret name is automatic
 
 The `openai` provider automatically looks for the `OPENAI_KEY` secret. See the [Secrets documentation](./secrets.mdx) for more information on managing secrets securely in Wave.
 
+## Custom System Prompts
+
+You can customize the system prompt for any AI mode to control the AI's behavior and personality. This allows you to override or extend the default Wave AI system prompt.
+
+### System Prompt Modes
+
+There are two modes for applying custom system prompts:
+
+| Mode | Description |
+|------|-------------|
+| `"replace"` (default) | Completely replaces the built-in Wave AI system prompt with your custom prompt |
+| `"append"` | Adds your custom prompt after the built-in Wave AI system prompt |
+
+### Example: Replace Mode
+
+Use this when you want full control over the AI's behavior:
+
+```json
+{
+  "my-custom-assistant": {
+    "display:name": "My Coding Assistant",
+    "ai:provider": "openai",
+    "ai:model": "gpt-4o",
+    "ai:systemprompt": "You are a specialized coding assistant focused on Go and TypeScript. Always provide concise, well-commented code examples. Prefer modern language features and best practices.",
+    "ai:systempromptmode": "replace"
+  }
+}
+```
+
+### Example: Append Mode
+
+Use this when you want to add context to the default Wave AI behavior:
+
+```json
+{
+  "ollama-with-context": {
+    "display:name": "Ollama with Project Context",
+    "ai:model": "llama3.3:70b",
+    "ai:endpoint": "http://localhost:11434/v1/chat/completions",
+    "ai:apitoken": "ollama",
+    "ai:systemprompt": "Additional context: The user is working on a terminal emulator project called Wave Terminal. They may ask about SSH, file previews, or AI integration.",
+    "ai:systempromptmode": "append"
+  }
+}
+```
+
+:::tip
+When using `"replace"` mode, your custom prompt completely replaces Wave's built-in prompt. Make sure to include any important instructions about tool usage and capabilities if you want the AI to maintain full Wave integration.
+:::
+
 ## Multiple Modes Example
 
 You can define multiple AI modes and switch between them easily:
@@ -543,6 +593,8 @@ If you get "model not found" errors:
 | `ai:azureresourcename` | No | Azure resource name (for Azure providers) |
 | `ai:azuredeployment` | No | Azure deployment name (for `azure-legacy` provider) |
 | `ai:capabilities` | No | Array of supported capabilities: `"tools"`, `"images"`, `"pdfs"` |
+| `ai:systemprompt` | No | Custom system prompt to control AI behavior for this mode |
+| `ai:systempromptmode` | No | How to apply the custom system prompt: `"replace"` (default) or `"append"` |
 | `waveai:cloud` | No | Internal - for Wave Cloud AI configuration only |
 | `waveai:premium` | No | Internal - for Wave Cloud AI configuration only |
 

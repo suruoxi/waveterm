@@ -33,6 +33,8 @@ declare global {
         "ai:azuredeployment"?: string;
         "ai:capabilities"?: string[];
         "ai:switchcompat"?: string[];
+        "ai:systemprompt"?: string;
+        "ai:systempromptmode"?: string;
         "waveai:cloud"?: boolean;
         "waveai:premium"?: boolean;
     };
