@@ -95,6 +95,18 @@
           },
           "type": "array"
         },
+        "ai:systemprompt": {
+          "type": "string",
+          "description": "Custom system prompt to control AI behavior for this mode"
+        },
+        "ai:systempromptmode": {
+          "type": "string",
+          "enum": [
+            "replace",
+            "append"
+          ],
+          "description": "How to apply the custom system prompt: replace (fully replace built-in prompt) or append (add after built-in prompt). Defaults to replace."
+        },
         "waveai:cloud": {
           "type": "boolean"
         },

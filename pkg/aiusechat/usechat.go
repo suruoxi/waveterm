@@ -46,9 +46,17 @@ var (
 	activeChats = ds.MakeSyncMap[bool]() // key is chatid
 )
 
-func getSystemPrompt(apiType string, model string, isBuilder bool, hasToolsCapability bool, widgetAccess bool) []string {
+func getSystemPrompt(apiType string, model string, isBuilder bool, hasToolsCapability bool, widgetAccess bool, customPrompt string, customPromptMode string) []string {
 	if isBuilder {
 		return []string{}
+	}
+	// Normalize empty mode to "replace" (the default)
+	if customPromptMode == "" {
+		customPromptMode = "replace"
+	}
+	// If a custom system prompt is configured with "replace" mode, use it directly
+	if customPrompt != "" && customPromptMode == "replace" {
+		return []string{customPrompt}
 	}
 	useNoToolsPrompt := !hasToolsCapability || !widgetAccess
 	basePrompt := SystemPromptText_OpenAI
@@ -57,10 +65,15 @@ func getSystemPrompt(apiType string, model string, isBuilder bool, hasToolsCapab
 	}
 	modelLower := strings.ToLower(model)
 	needsStrictToolAddOn, _ := regexp.MatchString(`(?i)\b(mistral|o?llama|qwen|mixtral|yi|phi|deepseek)\b`, modelLower)
+	prompts := []string{basePrompt}
 	if needsStrictToolAddOn && !useNoToolsPrompt {
-		return []string{basePrompt, SystemPromptText_StrictToolAddOn}
+		prompts = append(prompts, SystemPromptText_StrictToolAddOn)
 	}
-	return []string{basePrompt}
+	// If a custom system prompt is configured with "append" mode, append it
+	if customPrompt != "" && customPromptMode == "append" {
+		prompts = append(prompts, customPrompt)
+	}
+	return prompts
 }
 
 func isLocalEndpoint(endpoint string) bool {
@@ -106,6 +119,9 @@ func getWaveAISettings(premium bool, builderMode bool, rtInfo waveobj.ObjRTInfo,
 		return nil, fmt.Errorf("no ai:endpoint configured for AI mode %s", aiMode)
 	}
 
+	if config.SystemPromptMode != "" && config.SystemPromptMode != "replace" && config.SystemPromptMode != "append" {
+		return nil, fmt.Errorf("invalid ai:systempromptmode %q: must be \"replace\" or \"append\"", config.SystemPromptMode)
+	}
 	thinkingLevel := config.ThinkingLevel
 	if thinkingLevel == "" {
 		thinkingLevel = uctypes.ThinkingLevelMedium
@@ -115,17 +131,19 @@ func getWaveAISettings(premium bool, builderMode bool, rtInfo waveobj.ObjRTInfo,
 		verbosity = uctypes.VerbosityLevelMedium // default to medium
 	}
 	opts := &uctypes.AIOptsType{
-		Provider:      config.Provider,
-		APIType:       config.APIType,
-		Model:         config.Model,
-		MaxTokens:     maxTokens,
-		ThinkingLevel: thinkingLevel,
-		Verbosity:     verbosity,
-		AIMode:        aiMode,
-		Endpoint:      baseUrl,
-		ProxyURL:      config.ProxyURL,
-		Capabilities:  config.Capabilities,
-		WaveAIPremium: config.WaveAIPremium,
+		Provider:         config.Provider,
+		APIType:          config.APIType,
+		Model:            config.Model,
+		MaxTokens:        maxTokens,
+		ThinkingLevel:    thinkingLevel,
+		Verbosity:        verbosity,
+		AIMode:           aiMode,
+		Endpoint:         baseUrl,
+		ProxyURL:         config.ProxyURL,
+		Capabilities:     config.Capabilities,
+		WaveAIPremium:    config.WaveAIPremium,
+		SystemPrompt:     config.SystemPrompt,
+		SystemPromptMode: config.SystemPromptMode,
 	}
 	if apiToken != "" {
 		opts.APIToken = apiToken
@@ -692,7 +710,7 @@ func WaveAIPostMessageHandler(w http.ResponseWriter, r *http.Request) {
 		BuilderId:            req.BuilderId,
 		BuilderAppId:         req.BuilderAppId,
 	}
-	chatOpts.SystemPrompt = getSystemPrompt(chatOpts.Config.APIType, chatOpts.Config.Model, chatOpts.BuilderId != "", chatOpts.Config.HasCapability(uctypes.AICapabilityTools), chatOpts.WidgetAccess)
+	chatOpts.SystemPrompt = getSystemPrompt(chatOpts.Config.APIType, chatOpts.Config.Model, chatOpts.BuilderId != "", chatOpts.Config.HasCapability(uctypes.AICapabilityTools), chatOpts.WidgetAccess, chatOpts.Config.SystemPrompt, chatOpts.Config.SystemPromptMode)
 
 	if req.TabId != "" {
 		chatOpts.TabStateGenerator = func() (string, []uctypes.ToolDefinition, string, error) {
