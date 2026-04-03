@@ -14,7 +14,6 @@ import { isBuilderWindow } from "@/app/store/windowtype";
 import * as WOS from "@/app/store/wos";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
-import { WorkspaceLayoutModel } from "@/app/workspace/workspace-layout-model";
 import { BuilderFocusManager } from "@/builder/store/builder-focusmanager";
 import { getWebServerEndpoint } from "@/util/endpoints";
 import { base64ToArrayBuffer } from "@/util/util";
@@ -108,12 +107,7 @@ export class WaveAIModel {
             return get(FocusManager.getInstance().focusType) === "waveai";
         });
 
-        this.panelVisibleAtom = jotai.atom((get) => {
-            if (this.inBuilder) {
-                return true;
-            }
-            return get(WorkspaceLayoutModel.getInstance().panelVisibleAtom);
-        });
+        this.panelVisibleAtom = jotai.atom(true); // AI panel is now managed as a block, always visible
 
         this.defaultModeAtom = jotai.atom((get) => {
             const telemetryEnabled = get(getSettingsKeyAtom("telemetry:enabled")) ?? false;
@@ -315,9 +309,7 @@ export class WaveAIModel {
     }
 
     focusInput() {
-        if (!this.inBuilder && !WorkspaceLayoutModel.getInstance().getAIPanelVisible()) {
-            WorkspaceLayoutModel.getInstance().setAIPanelVisible(true);
-        }
+        // AI panel is now managed as a block, just focus the input
         if (this.inputRef?.current) {
             this.inputRef.current.focus();
         }
@@ -677,9 +669,7 @@ export class WaveAIModel {
     }
 
     closeWaveAIPanel() {
-        if (this.inBuilder) {
-            return;
-        }
-        WorkspaceLayoutModel.getInstance().setAIPanelVisible(false);
+        // AI panel is now managed as a block, closing is handled by the layout model
+        // This method is kept for API compatibility but does nothing
     }
 }

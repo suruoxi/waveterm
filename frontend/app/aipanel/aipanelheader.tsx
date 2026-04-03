@@ -21,14 +21,9 @@ export const AIPanelHeader = memo(() => {
 
     return (
         <div
-            className="py-2 pl-3 pr-1 @xs:p-2 @xs:pl-4 border-b border-gray-600 flex items-center justify-between min-w-0"
+            className="py-2 pl-3 pr-1 @xs:p-2 @xs:pl-4 border-b border-gray-600 flex items-center justify-end min-w-0"
             onContextMenu={handleContextMenu}
         >
-            <h2 className="text-white text-sm @xs:text-lg font-semibold flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
-                <i className="fa fa-sparkles text-accent"></i>
-                Wave AI
-            </h2>
-
             <div className="flex items-center flex-shrink-0 whitespace-nowrap">
                 {!inBuilder && (
                     <div className="flex items-center text-sm whitespace-nowrap">
