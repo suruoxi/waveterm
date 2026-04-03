@@ -7,7 +7,7 @@ import { getTabModelByTabId } from "@/app/store/tab-model";
 import { makeORef } from "@/app/store/wos";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { useWaveEnv } from "@/app/waveenv/waveenv";
-import { WorkspaceLayoutModel } from "@/app/workspace/workspace-layout-model";
+import { createBlock } from "@/app/store/global";
 import { validateCssColor } from "@/util/color-validator";
 import { cn, fireAndForget } from "@/util/util";
 import { useAtomValue } from "jotai";
@@ -21,12 +21,11 @@ export type { VTabItem } from "./vtab";
 
 const VTabBarAIButton = memo(() => {
     const env = useWaveEnv<VTabBarEnv>();
-    const aiPanelOpen = useAtomValue(WorkspaceLayoutModel.getInstance().panelVisibleAtom);
     const hideAiButton = useAtomValue(env.getSettingsKeyAtom("app:hideaibutton"));
 
     const onClick = () => {
-        const currentVisible = WorkspaceLayoutModel.getInstance().getAIPanelVisible();
-        WorkspaceLayoutModel.getInstance().setAIPanelVisible(!currentVisible);
+        // Create a waveai block when clicking the AI button
+        createBlock({ meta: { view: "waveai" } });
     };
 
     if (hideAiButton) {
@@ -38,7 +37,7 @@ const VTabBarAIButton = memo(() => {
             content="Toggle Wave AI Panel"
             placement="bottom"
             hideOnClick
-            divClassName={`flex h-[22px] px-3.5 justify-end mb-1 items-center rounded-md mr-1 box-border cursor-pointer bg-hover hover:bg-hoverbg transition-colors text-[12px] ${aiPanelOpen ? "text-accent" : "text-secondary"}`}
+            divClassName={`flex h-[22px] px-3.5 justify-end mb-1 items-center rounded-md mr-1 box-border cursor-pointer bg-hover hover:bg-hoverbg transition-colors text-[12px] text-secondary`}
             divStyle={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
             divOnClick={onClick}
         >

@@ -3,7 +3,6 @@
 
 import { handleWaveAIContextMenu } from "@/app/aipanel/aipanel-contextmenu";
 import { waveAIHasSelection } from "@/app/aipanel/waveai-focus-utils";
-import { useTabBackground } from "@/app/block/blockutil";
 import { ErrorBoundary } from "@/app/element/errorboundary";
 import { atoms, getSettingsKeyAtom } from "@/app/store/global";
 import { globalStore } from "@/app/store/jotaiStore";
@@ -247,11 +246,7 @@ const ConfigChangeModeFixer = memo(() => {
 
 ConfigChangeModeFixer.displayName = "ConfigChangeModeFixer";
 
-type AIPanelComponentInnerProps = {
-    roundTopLeft: boolean;
-};
-
-const AIPanelComponentInner = memo(({ roundTopLeft }: AIPanelComponentInnerProps) => {
+const AIPanelComponentInner = memo(() => {
     const [isDragOver, setIsDragOver] = useState(false);
     const [isReactDndDragOver, setIsReactDndDragOver] = useState(false);
     const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -265,7 +260,6 @@ const AIPanelComponentInner = memo(({ roundTopLeft }: AIPanelComponentInnerProps
     const telemetryEnabled = jotai.useAtomValue(getSettingsKeyAtom("telemetry:enabled")) ?? false;
     const isPanelVisible = jotai.useAtomValue(model.getPanelVisibleAtom());
     const tabModel = useTabModelMaybe();
-    const [tabBorderColor, tabActiveBorderColor] = useTabBackground(waveEnv, tabModel?.tabId);
     const defaultMode = jotai.useAtomValue(getSettingsKeyAtom("waveai:defaultmode")) ?? "waveai@balanced";
     const aiModeConfigs = jotai.useAtomValue(model.aiModeConfigs);
 
@@ -550,25 +544,15 @@ const AIPanelComponentInner = memo(({ roundTopLeft }: AIPanelComponentInnerProps
     };
 
     const showBlockMask = isLayoutMode && showOverlayBlockNums;
-    const borderColor = isFocused ? (tabActiveBorderColor ?? null) : (tabBorderColor ?? null);
 
     return (
         <div
             ref={containerRef}
             data-waveai-panel="true"
             className={cn(
-                "@container bg-zinc-900/70 flex flex-col relative",
-                model.inBuilder ? "mt-0 h-full" : "mt-1 h-[calc(100%-4px)]",
-                (isDragOver || isReactDndDragOver) && "bg-zinc-800 border-accent",
-                isFocused && !borderColor ? "border-2 border-accent" : "border-2 border-transparent"
+                "bg-zinc-900/70 flex flex-col relative h-full w-full",
+                (isDragOver || isReactDndDragOver) && "bg-zinc-800"
             )}
-            style={{
-                borderTopLeftRadius: roundTopLeft ? 10 : 0,
-                borderTopRightRadius: model.inBuilder ? 0 : 10,
-                borderBottomRightRadius: model.inBuilder ? 0 : 10,
-                borderBottomLeftRadius: 10,
-                borderColor: borderColor ?? undefined,
-            }}
             onFocusCapture={handleFocusCapture}
             onPointerEnter={handlePointerEnter}
             onDragOver={handleDragOver}
@@ -619,14 +603,10 @@ const AIPanelComponentInner = memo(({ roundTopLeft }: AIPanelComponentInnerProps
 
 AIPanelComponentInner.displayName = "AIPanelInner";
 
-type AIPanelComponentProps = {
-    roundTopLeft: boolean;
-};
-
-const AIPanelComponent = ({ roundTopLeft }: AIPanelComponentProps) => {
+const AIPanelComponent = () => {
     return (
         <ErrorBoundary>
-            <AIPanelComponentInner roundTopLeft={roundTopLeft} />
+            <AIPanelComponentInner />
         </ErrorBoundary>
     );
 };
